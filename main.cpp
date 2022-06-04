@@ -17,17 +17,22 @@ public:
     int getCor(){
       return cor;
     }
+    void setCor(int val){
+      cor = val;
+    }
 };
 
 class Rainha: private Peca{
+public:
 };
 class Vazio: private Peca{
 };
-
+class Comum: private Peca{
+};
 class Tabuleiro{
-    Peca tabuleiro[8][8];
-    int proxJogador;
+  int proxJogador;
 public:
+  Peca tabuleiro[8][8];
     Tabuleiro():proxJogador(0){
             for(int i =0; i<8; i++){
                 for(int j= 0; j<8; j++){
@@ -69,8 +74,15 @@ public:
         cout <<endl << "----------------" << endl;
       }
     }
-    Tabuleiro(const Tabuleiro &s){ //construtor por cópia
+    Tabuleiro(const Tabuleiro &s){
+    } //construtor por cópia
+    int verificarJogada(int xi, int yi, int xf, int yf){
+      if(xi >= 8 || yi >= 8 || xf >= 8 || yf >= 8 || xi < 0 || yi < 0 || xf < 0 || yf < 0){
+        cout << "Jogada Invalida!!!" << endl;
+        return 0;
+      }
     }
+
 };
 
 int main(){

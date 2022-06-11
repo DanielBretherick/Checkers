@@ -42,6 +42,7 @@ public:
     void setCor(cores val){
       cor = val;
     }
+    // virtual bool verificarDestino() {};
 };
 
 int Peca::numPretas = 0;
@@ -52,31 +53,37 @@ class Rainha: private Peca{
 class Comum: public Peca{
 public:
   Comum(cores cor): Peca(COMUM, cor) {}
+  // bool verificarDestino(int xi, int yi, int xf, int yf) {
+    // 1. Movimento é diagonal
+    // 2. Se for 1 casas, verificar se há peças no destino
+    // 3. Se for 2 casas, verificar se há peça inimiga no caminho e se há peças no destino
+    // if()
+  // }
 };
 
 
 class Tabuleiro{
   int proxJogador;
-  Peca *tabuleiro[8][8];
 public:
+  Peca *tabuleiro[8][8];
   Tabuleiro(): tabuleiro{NULL}, proxJogador(0) {
     for(int i =0; i<8; i++){
       for(int j= 0; j<8; j++) {
-        if((i == 0 || i ==2)  && (j%2)) {
+        if((j == 0 || j ==2)  && (i%2)) {
           Comum *pA = new Comum(PRETA);
-          tabuleiro[i][j] = pA;
+          tabuleiro[j][i] = pA;
         }
-        if(i == 1 && !(j%2)){
+        if(j == 1 && !(i%2)){
           Comum *pB = new Comum(PRETA); 
-          tabuleiro[i][j] = pB;
+          tabuleiro[j][i] = pB;
         }
-        if((i == 5 || i ==7)  && !(j%2)) {
+        if((j == 5 || j ==7)  && !(i%2)) {
           Comum *pC = new Comum(BRANCA);
-          tabuleiro[i][j] = pC;
+          tabuleiro[j][i] = pC;
         }
-        if(i == 6 && (j%2)) {
+        if(j == 6 && (i%2)) {
           Comum *pD = new Comum(BRANCA);
-          tabuleiro[i][j] = pD;
+          tabuleiro[j][i] = pD;
         }
       }
     }
@@ -129,7 +136,9 @@ int main(){
   Tabuleiro tab;
   tab.imprimirTabuleiro();
 
-  cout << "BRECTHICK VIADÃO" << endl;
+  cout << letraCores[tab.tabuleiro[7-2][4]->getCor()]<< endl;
+
+  
 
   return 0;
 }

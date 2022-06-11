@@ -2,7 +2,9 @@
 
 
 #include <iostream>
+#include <math.h>
 #include <vector>
+
 
 using namespace std;
 
@@ -14,6 +16,7 @@ vector<char> letrasColunas({'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H'}) ;
 char letraCores[2] = {'B', 'P'};
 
 class Peca{
+protected:
   static int numPretas, numBrancas;
   tiposPeca tipo;
   cores cor;
@@ -42,30 +45,71 @@ public:
     void setCor(cores val){
       cor = val;
     }
-    // virtual bool verificarDestino() {};
+    virtual bool verificarDestino(int li, int ci, int lf, int cf, Tabuleiro &tb) {};
 };
 
 int Peca::numPretas = 0;
 int Peca::numBrancas = 0;
 
-class Rainha: private Peca{
+class Rainha: public Peca {
+public:
+  Rainha(cores cor): Peca(RAINHA, cor) {}
+  bool verificarDestino(int li, int ci, int lf, int cf, Tabuleiro &tb) {
+    // 1. Movimento é diagonal
+    // 2. Verificar se há peça no destino final
+    // 3. Se for so 1 casa dar ok
+    // 4. Se for mais de 1 casa, verificar se há peças inimigas no caminho
+    int dl = lf -li;
+    int dc = cf -ci;
+    if(abs(dl)!=abs(dc)) {return false;}
+    if(tb.tabuleiro[lf][cf] != NULL) {return false;}
+    if(abs(dl) == 1 && abs(dc) == 1) {return true;}
+    if(abs(dl) > 1 && abs(dc) > 1) {
+      int sinalC = dc/abs(dc);
+      int sinalL = dl/abs(dl);
+      for(int l=lf-2*sinalL,c=cf-2*sinalC ; l<lf ; ) {
+        if(tb.tabuleiro[l][c] != NULL) {
+          return false;
+        }
+        l+=sinalL;
+        c+=sinalC;
+      }
+      if(tb.tabuleiro[lf-sinalL][cf-sinalC] != NULL) {
+        if(tb.tabuleiro[lf-sinalL][cf-sinalC]->getCor() != cor)
+          return true;
+      }
+    }
+    return false;
+  }
 };
 class Comum: public Peca{
 public:
   Comum(cores cor): Peca(COMUM, cor) {}
-  // bool verificarDestino(int xi, int yi, int xf, int yf) {
+  bool verificarDestino(int li, int ci, int lf, int cf, Tabuleiro &tb) {
     // 1. Movimento é diagonal
     // 2. Se for 1 casas, verificar se há peças no destino
     // 3. Se for 2 casas, verificar se há peça inimiga no caminho e se há peças no destino
-    // if()
-  // }
+    int dl = lf -li;
+    int dc = cf -ci;
+    if(dl<0) {return false;}
+    if(tb.tabuleiro[lf][cf] != NULL) {return false;}
+    if(dl == 1 && abs(dc) == 1) {return true;}
+    if(dl == 2 && abs(dc) == 2) {
+      int sinal = dc/abs(dc);
+      if(tb.tabuleiro[li+1][ci+sinal] != NULL) {
+        if(tb.tabuleiro[li+1][ci+sinal]->getCor() != cor)
+          return true;
+      }
+    }
+    return false;
+  }
 };
 
 
 class Tabuleiro{
   int proxJogador;
-public:
   Peca *tabuleiro[8][8];
+public:
   Tabuleiro(): tabuleiro{NULL}, proxJogador(0) {
     for(int i =0; i<8; i++){
       for(int j= 0; j<8; j++) {
@@ -90,7 +134,8 @@ public:
   }
   ~Tabuleiro(){
   }
-  friend class Peca;
+  friend class Comum;
+  friend class Rainha;
   void imprimirTabuleiro(){
     for(int i = 0; i<8; i++){
       cout << 8-i << "  ";
@@ -116,16 +161,12 @@ public:
   }
   Tabuleiro(const Tabuleiro &s){
   } //construtor por cópia
-  void jogar(char xi, int yi, char xf, int yf);
-
-  bool verificarJogada(int xi, int yi, int xf, int yf) {
-    // 1. Verificar limites do tabuleiro
-    // 2. VerificarDestino()
-
-    if(xi >= 8 || yi >= 8 || xf >= 8 || yf >= 8 || xi < 0 || yi < 0 || xf < 0 || yf < 0)
+  void jogar(char li, int ci, char lf, int cf);
+  bool verificarJogada(int li, int ci, int lf, int cf) {
+    if(li >= 8 || ci >= 8 || lf >= 8 || cf >= 8 || li < 0 || ci < 0 || lf < 0 || cf < 0)
       cout << "Jogada Invalida!!!" << endl;
     else
-      // tabuleiro[xi][yi]->verificarDestino(xi, yi, xf, yf);
+      tabuleiro[li][ci]->verificarDestino(li, ci, lf, cf, *this);
     
     return true;
   }
@@ -136,7 +177,6 @@ int main(){
   Tabuleiro tab;
   tab.imprimirTabuleiro();
 
-  cout << letraCores[tab.tabuleiro[7-2][4]->getCor()]<< endl;
 
   
 

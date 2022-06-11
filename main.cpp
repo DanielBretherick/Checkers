@@ -129,5 +129,7 @@ int main(){
   Tabuleiro tab;
   tab.imprimirTabuleiro();
 
+  cout << "BRECTHICK VIADÃO" << endl;
+
   return 0;
 }

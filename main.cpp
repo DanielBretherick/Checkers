@@ -11,7 +11,7 @@ enum tiposPeca {COMUM, RAINHA, VAZIO};
 enum colunas {A, B, C, D, E, F, G, H};
 
 vector<char> letrasColunas({'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H'}) ;
-char letraCores[3] = {'B', 'P'};
+char letraCores[2] = {'B', 'P'};
 
 class Peca{
   static int numPretas, numBrancas;
@@ -19,7 +19,7 @@ class Peca{
   cores cor;
 public:
     //Construtor
-    Peca(tiposPeca tipo, cores ccor): tipo(tipo), cor(cor){
+    Peca(tiposPeca tipo, cores cor): tipo(tipo), cor(cor){
       if(cor == BRANCA)
         numBrancas++;
       if(cor == PRETA)

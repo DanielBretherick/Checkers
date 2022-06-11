@@ -5,59 +5,76 @@
 
 using namespace std;
 
-enum pecas{BRANCA, PRETA};
+enum cores {BRANCA, PRETA, NEUTRO};
+enum tiposPeca { VAZIO, COMUM, RAINHA};
+enum colunas {A, B, C, D, E, F, G, H};
+
+char letrasColunas[8] = {'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H'};
 
 class Peca{
-    int cor;
+  static int numPretas, numBrancas;
+  tiposPeca status;
+  cores cor;
+  int x, y;
 public:
-    Peca(){
+    Peca():
+      status(VAZIO) {
+      
     }
-    Peca(int c): cor(c){
+    Peca(cores c): cor(c){
     }
-    int getCor(){
-      return cor;
+    char getCor(){
+      switch (cor) {
+      case BRANCA:
+        return 'O';
+      case PRETA:
+        return 'X';
+      default:
+        return ' ';
+      }
     }
-    void setCor(int val){
+    void setCor(cores val){
       cor = val;
     }
 };
 
 class Rainha: private Peca{
-public:
 };
 class Vazio: private Peca{
 };
 class Comum: private Peca{
 };
+
+
 class Tabuleiro{
   int proxJogador;
 public:
   Peca tabuleiro[8][8];
-    Tabuleiro():proxJogador(0){
+    Tabuleiro(): proxJogador(0){
             for(int i =0; i<8; i++){
-                for(int j= 0; j<8; j++){
-                    if((i == 0 || i ==2)  && !(j%2)){
+                for(int j= 0; j<8; j++) {
+                    if((i == 0 || i ==2)  && (j%2)){
                         Peca a(PRETA);
                         tabuleiro[i][j] = a;
                         continue;
                     }
-                    if(i == 1 && (j%2)){
+                    if(i == 1 && !(j%2)){
                       Peca b(PRETA);
                       tabuleiro[i][j] = b;
                       continue;
                     }
-                    if((i == 5 || i ==7)  && (j%2)){
+                    if((i == 5 || i ==7)  && !(j%2)){
                       Peca c(BRANCA);
                       tabuleiro[i][j] = c;
                       continue;
                     }
-                    if(i == 6 && !(j%2)){
+                    if(i == 6 && (j%2)){
                       Peca d(BRANCA);
                       tabuleiro[i][j] = d;
                       continue;
                     }
                     else{
-                      Peca v(3);
+                      Peca v(NEUTRO);
                       tabuleiro[i][j] = v;
                       continue;
                     }
@@ -68,11 +85,21 @@ public:
     }
     void imprimirTabuleiro(){
       for(int i = 0; i<8; i++){
+        cout << 8-i << "  ";
         for(int j = 0; j<8; j++){
-          cout << tabuleiro[i][j].getCor() << "|";
+          cout << " " << tabuleiro[i][j].getCor();
+          if(j+1 < 8)
+            cout << " |";
         }
-        cout <<endl << "----------------" << endl;
+        if(i+1<8)
+          cout <<endl << "   -------------------------------" << endl;
+        else
+          cout << '\n' <<endl;
       }
+      cout << "    ";
+      for(int k=0; k<8; k++)
+        cout << letrasColunas[k] << "   ";
+      cout << endl;
     }
     Tabuleiro(const Tabuleiro &s){
     } //construtor por cópia

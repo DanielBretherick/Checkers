@@ -14,7 +14,7 @@ enum tiposPeca {COMUM, RAINHA, VAZIO};
 enum colunas {A, B, C, D, E, F, G, H};
 
 vector<char> letrasColunas({'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H'}) ;
-char letraCores[4] = {'b', 'p', 'B', 'P'};
+char letrasCores[4] = {'b', 'p', 'B', 'P'};
 
 class Peca;
 class Comum;
@@ -107,7 +107,7 @@ public:
           cout << "  ";
         else {
           cores cor = tabuleiro[i][j]->getCor();
-          cout << " " << (tabuleiro[i][j]->getTipo() == RAINHA ? letraCores[cor+2] : letraCores[cor]) ;
+          cout << " " << (tabuleiro[i][j]->getTipo() == RAINHA ? letrasCores[cor+2] : letrasCores[cor]) ;
         }
         if(j+1 < 8)
           cout << " |";
@@ -120,9 +120,6 @@ public:
     cout << "    ";
     for(int k=0; k<8; k++)
       cout << letrasColunas[k] << "   ";
-    cout << endl << endl;
-    cout << "Nº de peças BRANCAS: " << Peca::getNumBrancas() << endl;
-    cout << "Nº de peças PRETAS: " << Peca::getNumPretas();
     cout << endl << endl;
   }
 
@@ -145,10 +142,14 @@ public:
     }
   }
 
+  bool verificarVitoria() {
+    return (Peca::getNumBrancas() == 0 || Peca::getNumPretas == 0) ? true : false;
+  }
+
   void solicitarJogada() {
     int li, lf;
     char cci, ccf;
-    cout << "\n********** TURNO DO JOGADOR " << letraCores[proxJogador+2] << " **********\n" << endl;
+    cout << "\n********** TURNO DO JOGADOR " << letrasCores[proxJogador+2] << " **********\n" << endl;
     cout << "Escolha a posição da peça a ser movida: ";
     cin >> li >> cci;
 
@@ -188,7 +189,12 @@ public:
       }
       imprimirTabuleiro();
       proxJogador = (proxJogador == BRANCA) ? PRETA : BRANCA;
-      solicitarJogada();
+      if(verificarVitoria()) {
+        cout << "----------- Vitoria do jogador " << (Peca::getNumBrancas() == 0 ? letrasCores[2] : letrasCores[3] );
+        cout << " -----------" << endl;
+      }
+      else
+        solicitarJogada();
     }
    }
 

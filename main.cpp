@@ -3,6 +3,7 @@
 
 #include <iostream>
 #include <vector>
+#include <algorithm>
 
 using namespace std;
 
@@ -74,7 +75,7 @@ public:
           tabuleiro[j][i] = pA;
         }
         if(j == 1 && !(i%2)){
-          Comum *pB = new Comum(PRETA); 
+          Comum *pB = new Comum(PRETA);
           tabuleiro[j][i] = pB;
         }
         if((j == 5 || j ==7)  && !(i%2)) {
@@ -116,17 +117,36 @@ public:
   }
   Tabuleiro(const Tabuleiro &s){
   } //construtor por cópia
-  void jogar(char xi, int yi, char xf, int yf);
+  void jogar(int li, char ci, char lf, int cf){
+   int i = count(letrasColunas.begin(), letrasColunas.end(), ci);
+   if(i == 0)
+    cout << "*** --- Letra invalida --- ***"<< endl;
+   else{
+    int cit = 0;
+    int cft = 0;
+    for(int j = 0; j<8; j++){
+      if(ci == letrasColunas[j])
+        cit = j;
+      if(cf == letrasColunas[j])
+        cft = j;
+    }
+    int lit = 8 - li;
+    int lft = 8 - lf;
+    verificarJogada(lit,cit,lft,cft);
+   }
+  }
 
-  bool verificarJogada(int xi, int yi, int xf, int yf) {
+  bool verificarJogada(int lit, int cit, int lft, int cft) {
     // 1. Verificar limites do tabuleiro
     // 2. VerificarDestino()
 
-    if(xi >= 8 || yi >= 8 || xf >= 8 || yf >= 8 || xi < 0 || yi < 0 || xf < 0 || yf < 0)
-      cout << "Jogada Invalida!!!" << endl;
+    if(lit > 8 || cit > 8 || lft > 8 || cft > 8 || lit <= 0 || cit <= 0 || lft <= 0 || cft <= 0){
+      cout << "*** --- Posicao fora do Tabuleiro --- ***" << endl;
+      return false;
+    }
     else
       // tabuleiro[xi][yi]->verificarDestino(xi, yi, xf, yf);
-    
+
     return true;
   }
 };
@@ -135,10 +155,10 @@ int main(){
 
   Tabuleiro tab;
   tab.imprimirTabuleiro();
+  cout << endl;
+  tab.jogar(1,'L', 2,2);
 
-  cout << letraCores[tab.tabuleiro[7-2][4]->getCor()]<< endl;
 
-  
 
   return 0;
 }

@@ -119,23 +119,26 @@ public:
       cout << letrasColunas[k] << "   ";
     cout << endl;
   }
-  void jogar(int li, char ci, char lf, int cf) {
+
+  void transformarCoordenadas(int &li, char &ci, int &lf, char &cf){
    int i = count(letrasColunas.begin(), letrasColunas.end(), ci);
    int j = count(letrasColunas.begin(), letrasColunas.end(), cf);
    if(i == 0 || j == 0)
     cout << "*** --- Letra invalida --- ***"<< endl;
    else{
-    int cit = 0;
-    int cft = 0;
     for(int j = 0; j<8; j++){
       if(ci == letrasColunas[j])
-        cit = j;
+        ci = j;
       if(cf == letrasColunas[j])
-        cft = j;
+        cf = j;
     }
-    int lit = 8 - li;
-    int lft = 8 - lf;
-    
+     li = 8 - li;
+     lf = 8 - lf;
+  }
+
+  void jogar(int li, char ci, int lf, char cf) {
+    transformarCoordenadas(li, ci, lf, cf);
+
     if(!verificarJogada(lit,cit,lft,cft)) {
       cout << "Jogada inválida" << endl;
     }
@@ -167,7 +170,7 @@ public:
       return false;
     }
     else {
-      if(tabuleiro[lit][cit] == NULL) 
+      if(tabuleiro[lit][cit] == NULL)
         return false;
       else
         if(tabuleiro[lit][cit]->getCor() != proxJogador)

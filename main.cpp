@@ -28,31 +28,28 @@ protected:
   tiposPeca tipo;
   cores cor;
 public:
-    //Construtor
-    Peca(tiposPeca tipo, cores cor): tipo(tipo), cor(cor){
-      if(cor == BRANCA)
-        numBrancas++;
-      if(cor == PRETA)
-        numPretas++;
-    }
-    //Construtor Default
-    Peca(): tipo(VAZIO), cor(NEUTRO) {
-    }
-    // Destrutor
-    ~Peca() {
-      if(cor == BRANCA)
-        numBrancas--;
-      if(cor== PRETA)
-        numPretas--;
-    }
-    cores getCor(){
-      return cor;
-    }
-    tiposPeca getTipo() {return tipo;}
-    void setCor(cores val){
-      cor = val;
-    }
-    virtual bool verificarDestino(int li, int ci, int lf, int cf, Tabuleiro &tb) {return false;};
+  //Construtor
+  Peca(tiposPeca tipo, cores cor): tipo(tipo), cor(cor){
+    if(cor == BRANCA)
+      numBrancas++;
+    if(cor == PRETA)
+      numPretas++;
+  }
+  //Construtor Default
+  Peca(): tipo(VAZIO), cor(NEUTRO) {
+  }
+  // Destrutor
+  ~Peca() {
+    if(cor == BRANCA)
+      numBrancas--;
+    if(cor== PRETA)
+      numPretas--;
+  }
+  cores getCor(){
+    return cor;
+  }
+  tiposPeca getTipo() {return tipo;}
+  virtual bool verificarDestino(int li, int ci, int lf, int cf, Tabuleiro &tb) {return false;};
 };
 
 int Peca::numPretas = 0;
@@ -70,10 +67,10 @@ public:
 };
 
 class Tabuleiro{
-  int proxJogador;
+  cores proxJogador;
   Peca *tabuleiro[8][8];
 public:
-  Tabuleiro(): tabuleiro{NULL}, proxJogador(0) {
+  Tabuleiro(): tabuleiro{NULL}, proxJogador(BRANCA) {
     for(int i =0; i<8; i++){
       for(int j= 0; j<8; j++) {
         if((j == 0 || j ==2)  && (i%2)) {
@@ -122,11 +119,10 @@ public:
       cout << letrasColunas[k] << "   ";
     cout << endl;
   }
-  Tabuleiro(const Tabuleiro &s){
-  } //construtor por cópia
-  void jogar(int li, char ci, char lf, int cf){
+  void jogar(int li, char ci, char lf, int cf) {
    int i = count(letrasColunas.begin(), letrasColunas.end(), ci);
-   if(i == 0)
+   int j = count(letrasColunas.begin(), letrasColunas.end(), cf);
+   if(i == 0 || j == 0)
     cout << "*** --- Letra invalida --- ***"<< endl;
    else{
     int cit = 0;
@@ -139,22 +135,46 @@ public:
     }
     int lit = 8 - li;
     int lft = 8 - lf;
-    verificarJogada(lit,cit,lft,cft);
+    
+    if(!verificarJogada(lit,cit,lft,cft)) {
+      cout << "Jogada inválida" << endl;
+    }
+      // Equals the destination and the moved piece
+      // Equals the inicial space to NULL
+      // Delete the taken piece, if it exists, and equal its old space to NULL
+
+      tabuleiro[lft][cft] = tabuleiro[lit][cit];
+      tabuleiro[lit][cit] = NULL;
+
+      int sinalL = (lft-lit)/abs((lft-lit));
+      int sinalC = (cft-cit)/abs((cft-cit));
+
+      if(tabuleiro[lft-sinalL][cft-sinalC] != NULL) {
+        delete tabuleiro[lft-sinalL][cft-sinalC];
+        tabuleiro[lft-sinalL][cft-sinalC] = NULL;
+      }
+
    }
   }
 
   bool verificarJogada(int lit, int cit, int lft, int cft) {
     // 1. Verificar limites do tabuleiro
-    // 2. VerificarDestino()
+    // 2. Verificar se há uma peça do seu time no local
+    // 3. VerificarDestino()
 
-    if(lit > 8 || cit > 8 || lft > 8 || cft > 8 || lit <= 0 || cit < 0 || lft <= 0 || cft < 0){
+    if(lit > 8 || cit > 8 || lft > 8 || cft > 8 || lit <= 0 || cit < 0 || lft <= 0 || cft < 0) {
       cout << "*** --- Posicao fora do Tabuleiro --- ***" << endl;
       return false;
     }
-    else
-      tabuleiro[lit][cit]->verificarDestino(lit, cit, lft, cft, *this);
+    else {
+      if(tabuleiro[lit][cit] == NULL) 
+        return false;
+      else
+        if(tabuleiro[lit][cit]->getCor() != proxJogador)
+          return false;
+    }
 
-    return true;
+    return tabuleiro[lit][cit]->verificarDestino(lit, cit, lft, cft, *this);
   }
 };
 
@@ -211,7 +231,6 @@ int main(){
   tab.imprimirTabuleiro();
   cout << endl;
   tab.jogar(1,'A', 2,'C');
-
 
 
   return 0;

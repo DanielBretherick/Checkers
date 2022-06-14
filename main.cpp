@@ -80,19 +80,21 @@ public:
   Tabuleiro(): tabuleiro{NULL}, proxJogador(VERDE) {
     for(int i =0; i<8; i++){
       for(int j= 0; j<8; j++) {
-        if((j == 0 || j ==2)  && (i%2)) {
-          Comum *pA = new Comum(VERMELHA);
-          tabuleiro[j][i] = pA;
-        }
-        if(j == 1 && !(i%2)){
+        // if((j == 0 || j ==2)  && (i%2)) {
+        //   Comum *pA = new Comum(VERMELHA);
+        //   tabuleiro[j][i] = pA;
+        // }
+        // if(j == 1 && !(i%2)){
+        if(j == 1 && !(i%6) && i!=0){
           Comum *pB = new Comum(VERMELHA);
           tabuleiro[j][i] = pB;
         }
-        if((j == 5 || j ==7)  && !(i%2)) {
-          Comum *pC = new Comum(VERDE);
-          tabuleiro[j][i] = pC;
-        }
-        if(j == 6 && (i%2)) {
+        // if((j == 5 || j ==7)  && !(i%2)) {
+        //   Comum *pC = new Comum(VERDE);
+        //   tabuleiro[j][i] = pC;
+        // }
+        // if(j == 6 && (i%2)) {
+        if(j == 6 && !(i%5) && i!=0) {
           Comum *pD = new Comum(VERDE);
           tabuleiro[j][i] = pD;
         }
@@ -149,7 +151,10 @@ public:
   }
 
   bool verificarVitoria() {
-    return (Peca::getNumVerde() == 0 || Peca::getNumVermelha == 0) ? true : false;
+    int verde, vermelha;
+    verde = Peca::getNumVerde();
+    vermelha = Peca::getNumVermelha();
+    return (Peca::getNumVerde() == 0 || Peca::getNumVermelha() == 0) ? true : false;
   }
 
   void solicitarJogada() {
@@ -158,7 +163,7 @@ public:
     cout << "\n********** TURNO DO JOGADOR " << letrasCores[proxJogador+2] << " **********\n" << endl;
     cout << "Escolha a posição da peça a ser movida: ";
     cin >> li >> cci;
-
+    
     if(cci >= 'a' && cci <= 'z') {
       cci+= ('A'-'a');
     }
@@ -195,6 +200,7 @@ public:
       }
       imprimirTabuleiro();
       proxJogador = (proxJogador == VERDE) ? VERMELHA : VERDE;
+
       if(verificarVitoria()) {
         cout << "----------- Vitoria do jogador " << (Peca::getNumVerde() == 0 ? letrasCores[2] : letrasCores[3] );
         cout << " -----------" << endl;

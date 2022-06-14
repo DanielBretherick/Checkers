@@ -289,7 +289,7 @@ bool Rainha::verificarDestino(int li, int ci, int lf, int cf, Tabuleiro &tb) {
     if(abs(dl) > 1 && abs(dc) > 1) {
       int sinalC = dc/abs(dc);
       int sinalL = dl/abs(dl);
-      for(int l=li+sinalL,c=ci+sinalC ; l!=lf ; ) {
+      for(int l=li+sinalL,c=ci+sinalC ; l!=(lf-sinalL) ; ) {
         if(tb.tabuleiro[l][c] != NULL) {
           return false;
         }

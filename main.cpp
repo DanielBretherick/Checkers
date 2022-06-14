@@ -306,11 +306,12 @@ bool Rainha::verificarDestino(int li, int ci, int lf, int cf, Tabuleiro &tb) {
   }
 
 int main(){
+  cout << "Cuadros viadão" << endl;
 
   Tabuleiro tab;
   tab.imprimirTabuleiro();
   tab.solicitarJogada();
-
+  
 
   return 0;
 }

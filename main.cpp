@@ -151,10 +151,20 @@ public:
   }
 
   bool verificarVitoria() {
-    int verde, vermelha;
-    verde = Peca::getNumVerde();
-    vermelha = Peca::getNumVermelha();
     return (Peca::getNumVerde() == 0 || Peca::getNumVermelha() == 0) ? true : false;
+  }
+
+  void transformarRainha(int l, int c) {
+    if(l == 0 && tabuleiro[l][c]->getCor() == VERDE ) { 
+      Rainha *pG = new Rainha(VERDE);
+      delete tabuleiro[l][c];
+      tabuleiro[l][c] = pG;
+    }
+    if(l == 7 && tabuleiro[l][c]->getCor() == VERMELHA ) { 
+      Rainha *pR = new Rainha(VERMELHA);
+      delete tabuleiro[l][c];
+      tabuleiro[l][c] = pR;
+    }
   }
 
   void solicitarJogada() {
@@ -198,6 +208,7 @@ public:
         delete tabuleiro[lf-sinalL][cf-sinalC];
         tabuleiro[lf-sinalL][cf-sinalC] = NULL;
       }
+      transformarRainha(lf, cf);
       imprimirTabuleiro();
       proxJogador = (proxJogador == VERDE) ? VERMELHA : VERDE;
 
@@ -211,7 +222,7 @@ public:
    }
 
   bool verificarJogada(int li, int ci, int lf, int cf) {
-    if(li > 8 || ci > 8 || lf > 8 || cf > 8 || li <= 0 || ci < 0 || lf <= 0 || cf < 0) {
+    if(li > 8 || ci > 8 || lf > 8 || cf > 8 || li < 0 || ci < 0 || lf < 0 || cf < 0) {
       cout << "*** --- Posicao fora do Tabuleiro --- ***" << endl;
       return false;
     }
@@ -277,8 +288,8 @@ bool Rainha::verificarDestino(int li, int ci, int lf, int cf, Tabuleiro &tb) {
     if(abs(dl) == 1 && abs(dc) == 1) {return true;}
     if(abs(dl) > 1 && abs(dc) > 1) {
       int sinalC = dc/abs(dc);
-      int sinalL = -dl/abs(dl);
-      for(int l=lf-2*sinalL,c=cf-2*sinalC ; l<lf ; ) {
+      int sinalL = dl/abs(dl);
+      for(int l=li+sinalL,c=ci+sinalC ; l!=lf ; ) {
         if(tb.tabuleiro[l][c] != NULL) {
           return false;
         }
@@ -289,6 +300,7 @@ bool Rainha::verificarDestino(int li, int ci, int lf, int cf, Tabuleiro &tb) {
         if(tb.tabuleiro[lf-sinalL][cf-sinalC]->getCor() != cor)
           return true;
       }
+        return true;
     }
     return false;
   }

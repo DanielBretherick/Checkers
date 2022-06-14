@@ -18,7 +18,7 @@ enum tiposPeca {COMUM, RAINHA, VAZIO};
 enum colunas {A, B, C, D, E, F, G, H};
 
 vector<char> letrasColunas({'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H'}) ;
-char letrasCores[4] = {'b', 'p', 'B', 'P'};
+char letrasCores[4] = {'g', 'r', 'G', 'R'};
 
 class Peca;
 class Comum;
@@ -80,21 +80,19 @@ public:
   Tabuleiro(): tabuleiro{NULL}, proxJogador(VERDE) {
     for(int i =0; i<8; i++){
       for(int j= 0; j<8; j++) {
-        // if((j == 0 || j ==2)  && (i%2)) {
-        //   Comum *pA = new Comum(VERMELHA);
-        //   tabuleiro[j][i] = pA;
-        // }
-        // if(j == 1 && !(i%2)){
-        if(j == 1 && !(i%6) && i!=0){
+        if((j == 0 || j ==2)  && (i%2)) {
+          Comum *pA = new Comum(VERMELHA);
+          tabuleiro[j][i] = pA;
+        }
+        if(j == 1 && !(i%2)){
           Comum *pB = new Comum(VERMELHA);
           tabuleiro[j][i] = pB;
         }
-        // if((j == 5 || j ==7)  && !(i%2)) {
-        //   Comum *pC = new Comum(VERDE);
-        //   tabuleiro[j][i] = pC;
-        // }
-        // if(j == 6 && (i%2)) {
-        if(j == 6 && !(i%5) && i!=0) {
+        if((j == 5 || j ==7)  && !(i%2)) {
+          Comum *pC = new Comum(VERDE);
+          tabuleiro[j][i] = pC;
+        }
+        if(j == 6 && (i%2)) {
           Comum *pD = new Comum(VERDE);
           tabuleiro[j][i] = pD;
         }
@@ -135,7 +133,7 @@ public:
     int i = count(letrasColunas.begin(), letrasColunas.end(), ci);
     int j = count(letrasColunas.begin(), letrasColunas.end(), cf);
     if(i == 0 || j == 0)
-      cout << "*** --- Letra invalida --- ***"<< endl;
+      cout << "\n*** --- Letra invalida --\n- ***"<< endl;
     else {
       for(int j = 0; j<8; j++){
         if(ci == letrasColunas[j])
@@ -213,7 +211,7 @@ public:
       proxJogador = (proxJogador == VERDE) ? VERMELHA : VERDE;
 
       if(verificarVitoria()) {
-        cout << "----------- Vitoria do jogador " << (Peca::getNumVerde() == 0 ? letrasCores[2] : letrasCores[3] );
+        cout << "----------- Vitoria do jogador " << (Peca::getNumVerde() == 0 ? letrasCores[3] : letrasCores[2] );
         cout << " -----------" << endl;
       }
       else
@@ -223,17 +221,17 @@ public:
 
   bool verificarJogada(int li, int ci, int lf, int cf) {
     if(li > 8 || ci > 8 || lf > 8 || cf > 8 || li < 0 || ci < 0 || lf < 0 || cf < 0) {
-      cout << "*** --- Posicao fora do Tabuleiro --- ***" << endl;
+      cout << "\n*** --- Posicao fora do Tabuleiro --- ***\n" << endl;
       return false;
     }
     else {
       if(tabuleiro[li][ci] == NULL){
-        cout << "*** --- Posição sem peças --- ***" << endl;
+        cout << "\n*** --- Posição sem peças --- ***\n" << endl;
         return false;
         }
       else
         if(tabuleiro[li][ci]->getCor() != proxJogador){
-          cout << "*** --- Peça de outro jogador --- ***" << endl;
+          cout << "\n*** --- Peça de outro jogador --- ***\n" << endl;
           return false;
           }
     }
@@ -245,15 +243,15 @@ bool Comum::verificarDestino(int li, int ci, int lf, int cf, Tabuleiro &tb) {
   int dl = li -lf;
   int dc = cf -ci;
   if(abs(dl) != abs(dc)) { 
-    cout << "*** --- Movimento não foi diagonal --- ***" << endl;
+    cout << "\n*** --- Movimento não foi diagonal --- ***\n" << endl;
     return false;
   }
   if((dl<0 && (cor == VERDE))  || (dl > 0 && (cor == VERMELHA)) ) {
-    cout << "*** --- Indo para tras --- ***" << endl; 
+    cout << "\n*** --- Indo para tras --- ***\n" << endl; 
     return false;
   }
   if(tb.tabuleiro[lf][cf] != NULL) {
-    cout << "*** --- Posicao ocupada --- ***" << endl;
+    cout << "\n*** --- Posicao ocupada --- ***\n" << endl;
     return false;
   }
   if(abs(dl) == 1 && abs(dc) == 1) {return true;}
@@ -261,21 +259,20 @@ bool Comum::verificarDestino(int li, int ci, int lf, int cf, Tabuleiro &tb) {
     int sinalC = dc/abs(dc);
     int sinalL = -dl/abs(dl);
     if(tb.tabuleiro[li+sinalL][ci+sinalC] == NULL) {
-      cout << "*** --- Nao pode pular duas, espaco vazio --- ***" << endl;
+      cout << "\n*** --- Nao pode pular duas, espaco vazio --- ***\n" << endl;
       return false;
     }
     else{
       Peca *aux = tb.tabuleiro[li+sinalL][ci+sinalC];
       if(aux->getCor() == cor){
-        cout << "*** --- Nao pode comer a própria peca --- ***" << endl;
+        cout << "\n*** --- Nao pode comer a própria peca --- ***\n" << endl;
         return false;
       }
       return true;
     }
-
   }
   else{
-    cout << "*** --- Mais de duas casas andadas --- ***" << endl;
+    cout << "\n*** --- Mais de duas casas andadas --- ***\n" << endl;
     return false;
   }
 }
@@ -284,11 +281,11 @@ bool Rainha::verificarDestino(int li, int ci, int lf, int cf, Tabuleiro &tb) {
     int dl = lf -li;
     int dc = cf -ci;
     if(abs(dl)!=abs(dc)) {
-      cout << "*** --- Movimento não foi diagonal --- ***"<< endl;
+      cout << "\n*** --- Movimento não foi diagonal --- ***\n"<< endl;
       return false;
     }
     if(tb.tabuleiro[lf][cf] != NULL) {
-      cout << "*** --- Posição ocupada --- ***"<< endl;
+      cout << "\n*** --- Posição ocupada --- ***\n"<< endl;
       return false;
     }
     if(abs(dl) > 1 && abs(dc) > 1) {
@@ -296,22 +293,23 @@ bool Rainha::verificarDestino(int li, int ci, int lf, int cf, Tabuleiro &tb) {
       int sinalL = dl/abs(dl);
       for(int l=li+sinalL,c=ci+sinalC ; l!=(lf-sinalL) ; ) {
         if(tb.tabuleiro[l][c] != NULL) {
+          cout << "\n*** --- O caminho não está livre --- ***\n" << endl;
           return false;
         }
         l+=sinalL;
         c+=sinalC;
       }
       if(tb.tabuleiro[lf-sinalL][cf-sinalC] != NULL) {
-        if(tb.tabuleiro[lf-sinalL][cf-sinalC]->getCor() != cor)
-          return true;
+        if(tb.tabuleiro[lf-sinalL][cf-sinalC]->getCor() == cor) {
+          cout << "\n*** --- Não pode pular a própria peça --- ***\n";
+          return false;
+        }
       }
-        return true;
     }
     return true;
   }
 
 int main(){
-  cout << "Cuadros viadão" << endl;
 
   Tabuleiro tab;
   tab.imprimirTabuleiro();

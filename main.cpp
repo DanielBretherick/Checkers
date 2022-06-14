@@ -4,12 +4,16 @@
 #include <vector>
 #include <algorithm>
 
-#define WARNING "*** ---"
+#define OPEN_RED "\033[1;31m"
+#define OPEN_GREEN "\033[1;32m"
+
+#define CLOSE_COLOR "\033[0m"
+
 
 
 using namespace std;
 
-enum cores {BRANCA, PRETA, NEUTRO};
+enum cores {VERDE, VERMELHA, NEUTRO};
 enum tiposPeca {COMUM, RAINHA, VAZIO};
 enum colunas {A, B, C, D, E, F, G, H};
 
@@ -24,38 +28,38 @@ class Tabuleiro;
 
 class Peca{
 protected:
-  static int numPretas, numBrancas;
+  static int numVermelha, numVerde;
   tiposPeca tipo;
   cores cor;
 public:
   //Construtor
   Peca(tiposPeca tipo, cores cor): tipo(tipo), cor(cor){
-    if(cor == BRANCA)
-      numBrancas++;
-    if(cor == PRETA)
-      numPretas++;
+    if(cor == VERDE)
+      numVerde++;
+    if(cor == VERMELHA)
+      numVermelha++;
   }
   //Construtor Default
   Peca(): tipo(VAZIO), cor(NEUTRO) {
   }
   // Destrutor
   ~Peca() {
-    if(cor == BRANCA)
-      numBrancas--;
-    if(cor== PRETA)
-      numPretas--;
+    if(cor == VERDE)
+      numVerde--;
+    if(cor== VERMELHA)
+      numVermelha--;
   }
   cores getCor(){
     return cor;
   }
   tiposPeca getTipo() {return tipo;}
-  static int getNumBrancas() { return numBrancas; }
-  static int getNumPretas() { return numPretas; }
+  static int getNumVerde() { return numVerde; }
+  static int getNumVermelha() { return numVermelha; }
   virtual bool verificarDestino(int li, int ci, int lf, int cf, Tabuleiro &tb) {return false;};
 };
 
-int Peca::numPretas = 0;
-int Peca::numBrancas = 0;
+int Peca::numVermelha = 0;
+int Peca::numVerde = 0;
 
 class Rainha: public Peca {
 public:
@@ -73,23 +77,23 @@ class Tabuleiro{
   cores proxJogador;
   Peca *tabuleiro[8][8];
 public:
-  Tabuleiro(): tabuleiro{NULL}, proxJogador(BRANCA) {
+  Tabuleiro(): tabuleiro{NULL}, proxJogador(VERDE) {
     for(int i =0; i<8; i++){
       for(int j= 0; j<8; j++) {
         if((j == 0 || j ==2)  && (i%2)) {
-          Comum *pA = new Comum(PRETA);
+          Comum *pA = new Comum(VERMELHA);
           tabuleiro[j][i] = pA;
         }
         if(j == 1 && !(i%2)){
-          Comum *pB = new Comum(PRETA);
+          Comum *pB = new Comum(VERMELHA);
           tabuleiro[j][i] = pB;
         }
         if((j == 5 || j ==7)  && !(i%2)) {
-          Comum *pC = new Comum(BRANCA);
+          Comum *pC = new Comum(VERDE);
           tabuleiro[j][i] = pC;
         }
         if(j == 6 && (i%2)) {
-          Comum *pD = new Comum(BRANCA);
+          Comum *pD = new Comum(VERDE);
           tabuleiro[j][i] = pD;
         }
       }
@@ -107,7 +111,9 @@ public:
           cout << "  ";
         else {
           cores cor = tabuleiro[i][j]->getCor();
+          cout << (cor == VERDE ? OPEN_GREEN : OPEN_RED);
           cout << " " << (tabuleiro[i][j]->getTipo() == RAINHA ? letrasCores[cor+2] : letrasCores[cor]) ;
+          cout << CLOSE_COLOR;
         }
         if(j+1 < 8)
           cout << " |";
@@ -143,7 +149,7 @@ public:
   }
 
   bool verificarVitoria() {
-    return (Peca::getNumBrancas() == 0 || Peca::getNumPretas == 0) ? true : false;
+    return (Peca::getNumVerde() == 0 || Peca::getNumVermelha == 0) ? true : false;
   }
 
   void solicitarJogada() {
@@ -188,9 +194,9 @@ public:
         tabuleiro[lf-sinalL][cf-sinalC] = NULL;
       }
       imprimirTabuleiro();
-      proxJogador = (proxJogador == BRANCA) ? PRETA : BRANCA;
+      proxJogador = (proxJogador == VERDE) ? VERMELHA : VERDE;
       if(verificarVitoria()) {
-        cout << "----------- Vitoria do jogador " << (Peca::getNumBrancas() == 0 ? letrasCores[2] : letrasCores[3] );
+        cout << "----------- Vitoria do jogador " << (Peca::getNumVerde() == 0 ? letrasCores[2] : letrasCores[3] );
         cout << " -----------" << endl;
       }
       else
@@ -225,7 +231,7 @@ bool Comum::verificarDestino(int li, int ci, int lf, int cf, Tabuleiro &tb) {
     cout << "*** --- Movimento não foi diagonal --- ***" << endl;
     return false;
   }
-  if((dl<0 && (cor == BRANCA))  || (dl > 0 && (cor == PRETA)) ) {
+  if((dl<0 && (cor == VERDE))  || (dl > 0 && (cor == VERMELHA)) ) {
     cout << "*** --- Indo para tras --- ***" << endl; 
     return false;
   }

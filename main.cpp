@@ -283,9 +283,14 @@ bool Comum::verificarDestino(int li, int ci, int lf, int cf, Tabuleiro &tb) {
 bool Rainha::verificarDestino(int li, int ci, int lf, int cf, Tabuleiro &tb) {
     int dl = lf -li;
     int dc = cf -ci;
-    if(abs(dl)!=abs(dc)) {return false;}
-    if(tb.tabuleiro[lf][cf] != NULL) {return false;}
-    if(abs(dl) == 1 && abs(dc) == 1) {return true;}
+    if(abs(dl)!=abs(dc)) {
+      cout << "*** --- Movimento não foi diagonal --- ***"<< endl;
+      return false;
+    }
+    if(tb.tabuleiro[lf][cf] != NULL) {
+      cout << "*** --- Posição ocupada --- ***"<< endl;
+      return false;
+    }
     if(abs(dl) > 1 && abs(dc) > 1) {
       int sinalC = dc/abs(dc);
       int sinalL = dl/abs(dl);
@@ -302,7 +307,7 @@ bool Rainha::verificarDestino(int li, int ci, int lf, int cf, Tabuleiro &tb) {
       }
         return true;
     }
-    return false;
+    return true;
   }
 
 int main(){

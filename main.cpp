@@ -56,6 +56,7 @@ public:
   static int getNumVerde() { return numVerde; }
   static int getNumVermelha() { return numVermelha; }
   virtual bool verificarDestino(int li, int ci, int lf, int cf, Tabuleiro &tb) {return false;};
+  virtual bool verificarPodeComer(int li, int ci, int &lf, int &cf, Tabuleiro &tab) {return false; }
 };
 
 int Peca::numVermelha = 0;
@@ -71,6 +72,13 @@ public:
   Comum(cores cor): Peca(COMUM, cor) {}
   Comum(const Comum &c): Peca(c.tipo, c.cor) {}
   bool verificarDestino(int li, int ci, int lf, int cf, Tabuleiro &tb);
+  bool verificarPodeComer(int li, int ci, int &lf, int &cf, Tabuleiro &tab) {
+    int sinalL = (lf-li)/abs(lf-li);
+    int sinalC = (cf-ci)/abs(cf-ci);
+    if(tab[li+sinalL][ci+sinalC] == )
+   }
+
+
 };
 
 class Tabuleiro{
@@ -236,6 +244,21 @@ public:
           }
     }
     return tabuleiro[li][ci]->verificarDestino(li, ci, lf, cf, *this);
+  }
+  void jogadaComputador(){
+    int lf;
+    int cf;
+    //1. Escolher posicao
+      //1.a percorrer tabuleiro vendo possibilidades de comer
+      for(int l =0; l< 8; l++){
+        for(int c =0; c<8; c++){
+          if(tabuleiro[l][c] != NULL && tabuleiro[l][c]->getCor() == VERDE){
+            tabuleiro[l][c]->verificarPodeComer(l, c, lf, cf, *this);
+          }
+        }
+      }
+    //2. Passas posicao para o verificarJogada
+
   }
 };
 

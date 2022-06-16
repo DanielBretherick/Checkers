@@ -3,6 +3,8 @@
 #include <math.h>
 #include <vector>
 #include <algorithm>
+#include <chrono>
+#include <thread>
 
 #define OPEN_RED "\033[1;31m"
 #define OPEN_GREEN "\033[1;32m"
@@ -258,14 +260,8 @@ public:
   void jogadaComputador(){
     int lf;
     int cf;
-    // Percorrer tabuleiro procurando peças VERMELHAS
-    // Verificar se a peça pode comer alguma outra
-    // jogar
-      // Se nenhuma pode comer
-    // Percorrer novamente o tabuleiro
-    // Verificar se a peça pode fazer alguma jogada
-      // Se nenhuma peça puder mover 
-    // Empate
+    cout << "\nO computador " << letrasCores[proxJogador+2] << " está jogando...\n" << endl;
+    this_thread::sleep_for(chrono::seconds(2));
     for(int li = 0; li< 8; li++) {
       for(int ci =0; ci<8; ci++) {
         if(tabuleiro[li][ci] != NULL && tabuleiro[li][ci]->getCor() == proxJogador) {
@@ -337,16 +333,13 @@ bool Comum::verificarDestino(int li, int ci, int lf, int cf, Tabuleiro &tb) {
 
 bool Comum::verificarSePodeComer(int li, int ci, int &lf, int &cf, Tabuleiro &tb) {
   int sinalL = tb.proxJogador == VERDE ? -1 : 1;
-  if(tb.tabuleiro[li+sinalL][ci+1] != NULL && tb.tabuleiro[li+sinalL][ci+1]->getCor() != tb.proxJogador) {
-    lf = li + sinalL;
-    cf = ci + 2;
+  lf = li + 2*sinalL;
+  cf = ci + 2;
+  if(tb.verificarJogada(li,ci,lf,cf)) 
     return true;
-  }
-  if(tb.tabuleiro[li+sinalL][ci-1] != NULL && tb.tabuleiro[li+sinalL][ci-1]->getCor() != tb.proxJogador) {
-    lf = li + sinalL;
-    cf = ci - 2;
+  cf = ci - 2;
+  if(tb.verificarJogada(li,ci,lf,cf)) 
     return true;
-  }
   return false;
 }
 
@@ -360,12 +353,6 @@ bool Comum::verificarSePodeMover(int li, int ci, int &lf, int &cf, Tabuleiro &tb
   if(tb.verificarJogada(li, ci, lf, cf))
     return true;
   return false;
-  // if(tb.tabuleiro[li+sinalL][ci+1] == NULL) {
-  //   return true;
-  // }
-  // if(tb.tabuleiro[li+sinalL][ci-1] == NULL) {
-  //   return true;
-  // }
   return false;
 }
 

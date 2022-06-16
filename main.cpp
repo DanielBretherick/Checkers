@@ -56,29 +56,26 @@ public:
   static int getNumVerde() { return numVerde; }
   static int getNumVermelha() { return numVermelha; }
   virtual bool verificarDestino(int li, int ci, int lf, int cf, Tabuleiro &tb) {return false;};
-  virtual bool verificarPodeComer(int li, int ci, int &lf, int &cf, Tabuleiro &tab) {return false; }
+  virtual bool verificarSePodeComer(int li, int ci, int &lf, int &cf, Tabuleiro &tab) {return false; }
+  virtual bool verificarSePodeMover(int li, int ci, int &lf, int &cf, Tabuleiro &tab) {return false; }
 };
 
 int Peca::numVermelha = 0;
 int Peca::numVerde = 0;
 
-class Rainha: public Peca {
-public:
-  Rainha(cores cor): Peca(RAINHA, cor) {}
-  bool verificarDestino(int li, int ci, int lf, int cf, Tabuleiro &tb);
-};
 class Comum: public Peca{
 public:
   Comum(cores cor): Peca(COMUM, cor) {}
   Comum(const Comum &c): Peca(c.tipo, c.cor) {}
   bool verificarDestino(int li, int ci, int lf, int cf, Tabuleiro &tb);
-  bool verificarPodeComer(int li, int ci, int &lf, int &cf, Tabuleiro &tab) {
-    int sinalL = (lf-li)/abs(lf-li);
-    int sinalC = (cf-ci)/abs(cf-ci);
-    if(tab[li+sinalL][ci+sinalC] == )
-   }
+  bool verificarSePodeComer(int li, int ci, int &lf, int &cf, Tabuleiro &tb);
+  bool verificarSePodeMover(int li, int ci, int &lf, int &cf, Tabuleiro &tb);
+};
 
-
+class Rainha: public Peca {
+public:
+  Rainha(cores cor): Peca(RAINHA, cor) {}
+  bool verificarDestino(int li, int ci, int lf, int cf, Tabuleiro &tb);
 };
 
 class Tabuleiro{
@@ -141,7 +138,7 @@ public:
     int i = count(letrasColunas.begin(), letrasColunas.end(), ci);
     int j = count(letrasColunas.begin(), letrasColunas.end(), cf);
     if(i == 0 || j == 0)
-      cout << "\n*** --- Letra invalida --\n- ***"<< endl;
+      cout << "\n*** --- Letra invalida --- ***\n"<< endl;
     else {
       for(int j = 0; j<8; j++){
         if(ci == letrasColunas[j])
@@ -174,7 +171,7 @@ public:
   }
 
   void solicitarJogada() {
-    int li, lf;
+    int li, ci, lf, cf;
     char cci, ccf;
     cout << "\n********** TURNO DO JOGADOR " << letrasCores[proxJogador+2] << " **********\n" << endl;
     cout << "Escolha a posição da peça a ser movida: ";
@@ -192,16 +189,21 @@ public:
       ccf+= ('A'-'a');
     }
 
-    jogar(li, cci, lf, ccf);
+    transformarCoordenadas(li, cci, lf, ccf);
+
+    ci = (int)cci;
+    cf = (int)ccf;
+
+    jogar(li, ci, lf, cf);
   }
 
-  void jogar(int li, char cci, int lf, char ccf) {
-    transformarCoordenadas(li, cci, lf, ccf);
-    int ci = (int)cci;
-    int cf = (int)ccf;
+  void jogar(int li, int ci, int lf, int cf) {
     if(!verificarJogada(li,ci,lf,cf)) {
       cout << "!!!!!!!!! Insira outra jogada !!!!!!!!!\n" << endl;
-      solicitarJogada();
+      if(proxJogador == VERDE)
+          solicitarJogada();
+        else
+          jogadaComputador();
     }
     else{
       tabuleiro[lf][cf] = tabuleiro[li][ci];
@@ -222,43 +224,70 @@ public:
         cout << "----------- Vitoria do jogador " << (Peca::getNumVerde() == 0 ? letrasCores[3] : letrasCores[2] );
         cout << " -----------" << endl;
       }
-      else
-        solicitarJogada();
+      else {
+        if(proxJogador == VERDE)
+          solicitarJogada();
+        else
+          jogadaComputador();
+      }
     }
    }
 
   bool verificarJogada(int li, int ci, int lf, int cf) {
-    if(li > 8 || ci > 8 || lf > 8 || cf > 8 || li < 0 || ci < 0 || lf < 0 || cf < 0) {
-      cout << "\n*** --- Posicao fora do Tabuleiro --- ***\n" << endl;
+    if(li >= 8 || ci >= 8 || lf >= 8 || cf >= 8 || li < 0 || ci < 0 || lf < 0 || cf < 0) {
+      if(proxJogador != VERMELHA)
+        cout << "\n*** --- Posicao fora do Tabuleiro --- ***\n" << endl;
       return false;
     }
     else {
       if(tabuleiro[li][ci] == NULL){
-        cout << "\n*** --- Posição sem peças --- ***\n" << endl;
+        if(proxJogador != VERMELHA)
+          cout << "\n*** --- Posição sem peças --- ***\n" << endl;
         return false;
         }
       else
         if(tabuleiro[li][ci]->getCor() != proxJogador){
-          cout << "\n*** --- Peça de outro jogador --- ***\n" << endl;
+          if(proxJogador != VERMELHA)
+            cout << "\n*** --- Peça de outro jogador --- ***\n" << endl;
           return false;
           }
     }
     return tabuleiro[li][ci]->verificarDestino(li, ci, lf, cf, *this);
   }
+  
   void jogadaComputador(){
     int lf;
     int cf;
-    //1. Escolher posicao
-      //1.a percorrer tabuleiro vendo possibilidades de comer
-      for(int l =0; l< 8; l++){
-        for(int c =0; c<8; c++){
-          if(tabuleiro[l][c] != NULL && tabuleiro[l][c]->getCor() == VERDE){
-            tabuleiro[l][c]->verificarPodeComer(l, c, lf, cf, *this);
+    // Percorrer tabuleiro procurando peças VERMELHAS
+    // Verificar se a peça pode comer alguma outra
+    // jogar
+      // Se nenhuma pode comer
+    // Percorrer novamente o tabuleiro
+    // Verificar se a peça pode fazer alguma jogada
+      // Se nenhuma peça puder mover 
+    // Empate
+    for(int li = 0; li< 8; li++) {
+      for(int ci =0; ci<8; ci++) {
+        if(tabuleiro[li][ci] != NULL && tabuleiro[li][ci]->getCor() == proxJogador) {
+          if(tabuleiro[li][ci]->verificarSePodeComer(li, ci, lf, cf, *this)) {
+            jogar(li, ci, lf, cf);
+            return;
           }
         }
       }
-    //2. Passas posicao para o verificarJogada
+    }
 
+    for(int li = 0; li< 8; li++) {
+      for(int ci =0; ci<8; ci++) {
+        if(tabuleiro[li][ci] != NULL && tabuleiro[li][ci]->getCor() == VERMELHA) {
+          if(tabuleiro[li][ci]->verificarSePodeMover(li, ci, lf, cf, *this)) {
+            jogar(li, ci, lf, cf);
+            return;
+          }
+        }
+      }
+    }
+    // Adicionar tratamento para o empate
   }
 };
 
@@ -266,15 +295,18 @@ bool Comum::verificarDestino(int li, int ci, int lf, int cf, Tabuleiro &tb) {
   int dl = li -lf;
   int dc = cf -ci;
   if(abs(dl) != abs(dc)) { 
-    cout << "\n*** --- Movimento não foi diagonal --- ***\n" << endl;
+    if(tb.proxJogador != VERMELHA)
+      cout << "\n*** --- Movimento não foi diagonal --- ***\n" << endl;
     return false;
   }
   if((dl<0 && (cor == VERDE))  || (dl > 0 && (cor == VERMELHA)) ) {
-    cout << "\n*** --- Indo para tras --- ***\n" << endl; 
+    if(tb.proxJogador != VERMELHA)
+      cout << "\n*** --- Indo para tras --- ***\n" << endl; 
     return false;
   }
   if(tb.tabuleiro[lf][cf] != NULL) {
-    cout << "\n*** --- Posicao ocupada --- ***\n" << endl;
+    if(tb.proxJogador != VERMELHA)
+      cout << "\n*** --- Posicao ocupada --- ***\n" << endl;
     return false;
   }
   if(abs(dl) == 1 && abs(dc) == 1) {return true;}
@@ -282,33 +314,72 @@ bool Comum::verificarDestino(int li, int ci, int lf, int cf, Tabuleiro &tb) {
     int sinalC = dc/abs(dc);
     int sinalL = -dl/abs(dl);
     if(tb.tabuleiro[li+sinalL][ci+sinalC] == NULL) {
-      cout << "\n*** --- Nao pode pular duas, espaco vazio --- ***\n" << endl;
+      if(tb.proxJogador != VERMELHA)
+        cout << "\n*** --- Nao pode pular duas, espaco vazio --- ***\n" << endl;
       return false;
     }
     else{
       Peca *aux = tb.tabuleiro[li+sinalL][ci+sinalC];
       if(aux->getCor() == cor){
-        cout << "\n*** --- Nao pode comer a própria peca --- ***\n" << endl;
+        if(tb.proxJogador != VERMELHA)
+          cout << "\n*** --- Nao pode comer a própria peca --- ***\n" << endl;
         return false;
       }
       return true;
     }
   }
   else{
-    cout << "\n*** --- Mais de duas casas andadas --- ***\n" << endl;
+    if(tb.proxJogador != VERMELHA)
+      cout << "\n*** --- Mais de duas casas andadas --- ***\n" << endl;
     return false;
   }
+}
+
+bool Comum::verificarSePodeComer(int li, int ci, int &lf, int &cf, Tabuleiro &tb) {
+  int sinalL = tb.proxJogador == VERDE ? -1 : 1;
+  if(tb.tabuleiro[li+sinalL][ci+1] != NULL && tb.tabuleiro[li+sinalL][ci+1]->getCor() != tb.proxJogador) {
+    lf = li + sinalL;
+    cf = ci + 2;
+    return true;
+  }
+  if(tb.tabuleiro[li+sinalL][ci-1] != NULL && tb.tabuleiro[li+sinalL][ci-1]->getCor() != tb.proxJogador) {
+    lf = li + sinalL;
+    cf = ci - 2;
+    return true;
+  }
+  return false;
+}
+
+bool Comum::verificarSePodeMover(int li, int ci, int &lf, int &cf, Tabuleiro &tb) {
+  int sinalL = tb.proxJogador == VERDE ? -1 : 1;
+  lf = li + sinalL;
+  cf = ci + 1;
+  if(tb.verificarJogada(li, ci, lf, cf))
+    return true;
+  cf = ci - 1;
+  if(tb.verificarJogada(li, ci, lf, cf))
+    return true;
+  return false;
+  // if(tb.tabuleiro[li+sinalL][ci+1] == NULL) {
+  //   return true;
+  // }
+  // if(tb.tabuleiro[li+sinalL][ci-1] == NULL) {
+  //   return true;
+  // }
+  return false;
 }
 
 bool Rainha::verificarDestino(int li, int ci, int lf, int cf, Tabuleiro &tb) {
     int dl = lf -li;
     int dc = cf -ci;
     if(abs(dl)!=abs(dc)) {
-      cout << "\n*** --- Movimento não foi diagonal --- ***\n"<< endl;
+      if(tb.proxJogador != VERMELHA)
+        cout << "\n*** --- Movimento não foi diagonal --- ***\n"<< endl;
       return false;
     }
     if(tb.tabuleiro[lf][cf] != NULL) {
-      cout << "\n*** --- Posição ocupada --- ***\n"<< endl;
+      if(tb.proxJogador != VERMELHA)
+        cout << "\n*** --- Posição ocupada --- ***\n"<< endl;
       return false;
     }
     if(abs(dl) > 1 && abs(dc) > 1) {
@@ -316,7 +387,8 @@ bool Rainha::verificarDestino(int li, int ci, int lf, int cf, Tabuleiro &tb) {
       int sinalL = dl/abs(dl);
       for(int l=li+sinalL,c=ci+sinalC ; l!=(lf-sinalL) ; ) {
         if(tb.tabuleiro[l][c] != NULL) {
-          cout << "\n*** --- O caminho não está livre --- ***\n" << endl;
+          if(tb.proxJogador != VERMELHA)
+            cout << "\n*** --- O caminho não está livre --- ***\n" << endl;
           return false;
         }
         l+=sinalL;
@@ -324,7 +396,8 @@ bool Rainha::verificarDestino(int li, int ci, int lf, int cf, Tabuleiro &tb) {
       }
       if(tb.tabuleiro[lf-sinalL][cf-sinalC] != NULL) {
         if(tb.tabuleiro[lf-sinalL][cf-sinalC]->getCor() == cor) {
-          cout << "\n*** --- Não pode pular a própria peça --- ***\n";
+          if(tb.proxJogador != VERMELHA)
+            cout << "\n*** --- Não pode pular a própria peça --- ***\n";
           return false;
         }
       }

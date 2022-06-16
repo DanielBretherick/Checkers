@@ -177,6 +177,13 @@ public:
     cout << "Escolha a posição da peça a ser movida: ";
     cin >> li >> cci;
     
+    if(cin.fail()){
+      cout << "\n********** ERRO NA DIGITACAO DAS POSICOES **********\n" << endl;
+      cin.clear();
+      cin.ignore();
+      solicitarJogada();
+    }
+    else{
     if(cci >= 'a' && cci <= 'z') {
       cci+= ('A'-'a');
     }
@@ -195,6 +202,7 @@ public:
     cf = (int)ccf;
 
     jogar(li, ci, lf, cf);
+    }
   }
 
   void jogar(int li, int ci, int lf, int cf) {

@@ -78,6 +78,8 @@ class Rainha: public Peca {
 public:
   Rainha(cores cor): Peca(RAINHA, cor) {}
   bool verificarDestino(int li, int ci, int lf, int cf, Tabuleiro &tb);
+  bool verificarSePodeComer(int li, int ci, int &lf, int &cf, Tabuleiro &tb);
+  bool verificarSePodeMover(int li, int ci, int &lf, int &cf, Tabuleiro &tb);
 };
 
 class Tabuleiro{
@@ -175,17 +177,23 @@ public:
   void solicitarJogada() {
     int li, ci, lf, cf;
     char cci, ccf;
-    cout << "\n********** TURNO DO JOGADOR " << letrasCores[proxJogador+2] << " **********\n" << endl;
     cout << "Escolha a posição da peça a ser movida: ";
     cin >> li >> cci;
     
+    if(cin.fail()){
+      cout << "\n********** ERRO NA DIGITACAO DAS POSICOES **********\n" << endl;
+      cin.clear();
+      cin.ignore();
+      solicitarJogada();
+    }
+    else{
     if(cci >= 'a' && cci <= 'z') {
       cci+= ('A'-'a');
     }
 
     cout << "Escolha o destino do movimento: ";
     cin >> lf >> ccf;
-    cout << endl;
+    cout << '\n' << endl;
     
     if(ccf >= 'a' && ccf <= 'z') {
       ccf+= ('A'-'a');
@@ -197,11 +205,12 @@ public:
     cf = (int)ccf;
 
     jogar(li, ci, lf, cf);
+    }
   }
 
   void jogar(int li, int ci, int lf, int cf) {
     if(!verificarJogada(li,ci,lf,cf)) {
-      cout << "!!!!!!!!! Insira outra jogada !!!!!!!!!\n" << endl;
+      cout << "!----!----! Insira outra jogada !----!----!\n" << endl;
       if(proxJogador == VERDE)
           solicitarJogada();
         else
@@ -261,7 +270,7 @@ public:
     int lf;
     int cf;
     cout << "\nO computador " << letrasCores[proxJogador+2] << " está jogando...\n" << endl;
-    this_thread::sleep_for(chrono::seconds(2));
+    this_thread::sleep_for(chrono::seconds(1));
     for(int li = 0; li< 8; li++) {
       for(int ci =0; ci<8; ci++) {
         if(tabuleiro[li][ci] != NULL && tabuleiro[li][ci]->getCor() == proxJogador) {
@@ -275,7 +284,7 @@ public:
 
     for(int li = 0; li< 8; li++) {
       for(int ci =0; ci<8; ci++) {
-        if(tabuleiro[li][ci] != NULL && tabuleiro[li][ci]->getCor() == VERMELHA) {
+        if(tabuleiro[li][ci] != NULL && tabuleiro[li][ci]->getCor() == proxJogador) {
           if(tabuleiro[li][ci]->verificarSePodeMover(li, ci, lf, cf, *this)) {
             jogar(li, ci, lf, cf);
             return;
@@ -283,7 +292,6 @@ public:
         }
       }
     }
-    // Adicionar tratamento para o empate
   }
 };
 
@@ -343,6 +351,55 @@ bool Comum::verificarSePodeComer(int li, int ci, int &lf, int &cf, Tabuleiro &tb
   return false;
 }
 
+bool Rainha::verificarSePodeComer(int li, int ci, int &lf, int &cf, Tabuleiro &tb) {
+  int sinalL, sinalC;
+  int l = li - 1;
+  int c = ci + 1;
+  do {
+    if(l==-1) {
+        l = c - 1;
+        c = 0;
+      }
+    if(c==8) {
+      c = l + 1;
+      l = 7;
+    }
+    if(tb.tabuleiro[l][c] != NULL && tb.tabuleiro[l][c]->getCor() != tb.proxJogador) {
+      sinalL = (l-li)/abs(l-li);
+      sinalC = (c-ci)/abs(c-ci);
+      lf = l + sinalL;
+      cf = c + sinalC;
+      if(tb.verificarJogada(li,ci,lf,cf))
+        return true;
+    }
+    l = l - 1;
+    c = c + 1;
+  } while(li!=l);
+  l = li - 1;
+  c = ci - 1;
+  do {
+    if(l==-1) {
+        l = c - 1;
+        c = 0;
+      }
+    if(c==-1) {
+      c = 6 - l;
+      l = 7;
+    }
+    if(tb.tabuleiro[l][c] != NULL && tb.tabuleiro[l][c]->getCor() != tb.proxJogador) {
+      sinalL = (l-li)/abs(l-li);
+      sinalC = (c-ci)/abs(c-ci);
+      lf = l + sinalL;
+      cf = c + sinalC;
+      if(tb.verificarJogada(li,ci,lf,cf))
+        return true;
+    }
+    l = l - 1;
+    c = c - 1;
+  } while(li!=l);
+  return false;
+}
+
 bool Comum::verificarSePodeMover(int li, int ci, int &lf, int &cf, Tabuleiro &tb) {
   int sinalL = tb.proxJogador == VERDE ? -1 : 1;
   lf = li + sinalL;
@@ -353,8 +410,59 @@ bool Comum::verificarSePodeMover(int li, int ci, int &lf, int &cf, Tabuleiro &tb
   if(tb.verificarJogada(li, ci, lf, cf))
     return true;
   return false;
+}
+
+
+bool Rainha::verificarSePodeMover(int li, int ci, int &lf, int &cf, Tabuleiro &tb) {
+  int sinalL, sinalC;
+  int l = li - 1;
+  int c = ci + 1;
+  do {
+    if(l==-1) {
+        l = c - 1;
+        c = 0;
+      }
+    if(c==8) {
+      c = l + 1;
+      l = 7;
+    }
+    if(tb.tabuleiro[l][c] != NULL && tb.tabuleiro[l][c]->getCor() != tb.proxJogador) {
+      sinalL = (l-li)/abs(l-li);
+      sinalC = (c-ci)/abs(c-ci);
+      lf = l - sinalL;
+      cf = c - sinalC;
+      if(tb.verificarJogada(li,ci,lf,cf))
+        return true;
+    }
+    l = l - 1;
+    c = c + 1;
+  } while(li!=l);
+  l = li - 1;
+  c = ci - 1;
+  do {
+    if(l==-1) {
+        l = c - 1;
+        c = 0;
+      }
+    if(c==-1) {
+      c = 6 - l;
+      l = 7;
+    }
+    if(tb.tabuleiro[l][c] != NULL && tb.tabuleiro[l][c]->getCor() != tb.proxJogador) {
+      sinalL = (l-li)/abs(l-li);
+      sinalC = (c-ci)/abs(c-ci);
+      lf = l - sinalL;
+      cf = c - sinalC;
+      if(tb.verificarJogada(li,ci,lf,cf))
+        return true;
+    }
+    l = l + 1;
+    c = c - 1;
+  } while(li!=l);
   return false;
 }
+
+
 
 bool Rainha::verificarDestino(int li, int ci, int lf, int cf, Tabuleiro &tb) {
     int dl = lf -li;
@@ -397,6 +505,7 @@ int main(){
   Tabuleiro tab;
   tab.imprimirTabuleiro();
   tab.solicitarJogada();
+
   
 
   return 0;

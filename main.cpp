@@ -90,11 +90,13 @@ public:
     for(int i =0; i<8; i++){
       for(int j= 0; j<8; j++) {
         if((j == 0 || j ==2)  && (i%2)) {
-          Comum *pA = new Comum(VERMELHA);
+          // Comum *pA = new Comum(VERMELHA);
+          Rainha *pA = new Rainha(VERMELHA);
           tabuleiro[j][i] = pA;
         }
         if(j == 1 && !(i%2)){
-          Comum *pB = new Comum(VERMELHA);
+          // Comum *pB = new Comum(VERMELHA);
+          Rainha *pB = new Rainha(VERMELHA);
           tabuleiro[j][i] = pB;
         }
         if((j == 5 || j ==7)  && !(i%2)) {
@@ -372,6 +374,8 @@ bool Rainha::verificarSePodeComer(int li, int ci, int &lf, int &cf, Tabuleiro &t
       if(tb.verificarJogada(li,ci,lf,cf))
         return true;
     }
+    if(li==l)
+      break;
     l = l - 1;
     c = c + 1;
   } while(li!=l);
@@ -379,8 +383,8 @@ bool Rainha::verificarSePodeComer(int li, int ci, int &lf, int &cf, Tabuleiro &t
   c = ci - 1;
   do {
     if(l==-1) {
-        l = c - 1;
-        c = 0;
+        l = 6 - c;
+        c = 7;
       }
     if(c==-1) {
       c = 6 - l;
@@ -394,6 +398,8 @@ bool Rainha::verificarSePodeComer(int li, int ci, int &lf, int &cf, Tabuleiro &t
       if(tb.verificarJogada(li,ci,lf,cf))
         return true;
     }
+    if(li==l)
+      break;
     l = l - 1;
     c = c - 1;
   } while(li!=l);
@@ -434,6 +440,8 @@ bool Rainha::verificarSePodeMover(int li, int ci, int &lf, int &cf, Tabuleiro &t
       if(tb.verificarJogada(li,ci,lf,cf))
         return true;
     }
+    if(li==l)
+      break;
     l = l - 1;
     c = c + 1;
   } while(li!=l);
@@ -441,8 +449,8 @@ bool Rainha::verificarSePodeMover(int li, int ci, int &lf, int &cf, Tabuleiro &t
   c = ci - 1;
   do {
     if(l==-1) {
-        l = c - 1;
-        c = 0;
+        l = 6 - c;
+        c = 7;
       }
     if(c==-1) {
       c = 6 - l;
@@ -456,7 +464,9 @@ bool Rainha::verificarSePodeMover(int li, int ci, int &lf, int &cf, Tabuleiro &t
       if(tb.verificarJogada(li,ci,lf,cf))
         return true;
     }
-    l = l + 1;
+    if(li==l)
+      break;
+    l = l - 1;
     c = c - 1;
   } while(li!=l);
   return false;

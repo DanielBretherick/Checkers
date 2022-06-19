@@ -8,6 +8,7 @@
 
 #define OPEN_RED "\033[1;31m"
 #define OPEN_GREEN "\033[1;32m"
+#define OPEN_YELLOW "\033[1;33m"
 
 #define CLOSE_COLOR "\033[0m"
 
@@ -90,13 +91,11 @@ public:
     for(int i =0; i<8; i++){
       for(int j= 0; j<8; j++) {
         if((j == 0 || j ==2)  && (i%2)) {
-          // Comum *pA = new Comum(VERMELHA);
-          Rainha *pA = new Rainha(VERMELHA);
+          Comum *pA = new Comum(VERMELHA);
           tabuleiro[j][i] = pA;
         }
         if(j == 1 && !(i%2)){
-          // Comum *pB = new Comum(VERMELHA);
-          Rainha *pB = new Rainha(VERMELHA);
+          Comum *pB = new Comum(VERMELHA);
           tabuleiro[j][i] = pB;
         }
         if((j == 5 || j ==7)  && !(i%2)) {
@@ -179,7 +178,7 @@ public:
   void solicitarJogada() {
     int li, ci, lf, cf;
     char cci, ccf;
-    cout << "Escolha a posição da peça a ser movida: ";
+    cout << "Escolha a posição da peça a ser movida (Linha, Coluna): ";
     cin >> li >> cci;
     
     if(cin.fail()){
@@ -513,6 +512,9 @@ bool Rainha::verificarDestino(int li, int ci, int lf, int cf, Tabuleiro &tb) {
 int main(){
 
   Tabuleiro tab;
+  cout << OPEN_YELLOW << "  --------------------------------" << CLOSE_COLOR << endl;
+  cout << OPEN_YELLOW << "  ----------- CHECKERS -----------" << CLOSE_COLOR << endl;
+  cout << OPEN_YELLOW << "  --------------------------------\n" << CLOSE_COLOR << endl;
   tab.imprimirTabuleiro();
   tab.solicitarJogada();
 
